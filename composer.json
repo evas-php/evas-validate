@@ -1,6 +1,8 @@
 {
     "name": "evas-php/evas-validate",
     "description": "Validation module",
+    "version": "1.0",
+    "minimum-stability": "dev",
     "type": "library",
     "license": "MIT",
     "authors": [
