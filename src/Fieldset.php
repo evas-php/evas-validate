@@ -9,6 +9,7 @@ use Evas\Validate\Field;
 /**
 * Валидация набора полей.
 * @author Egor Vasyakin <e.vasyakin@itevas.ru>
+* @since 1.0
 */
 class Fieldset
 {

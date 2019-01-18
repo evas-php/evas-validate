@@ -7,6 +7,7 @@ namespace Evas\Validate;
 /**
 * Валидация поля.
 * @author Egor Vasyakin <e.vasyakin@itevas.ru>
+* @since 1.0
 */
 class Field
 {
