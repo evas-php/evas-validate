@@ -77,7 +77,7 @@ class Fieldset
                     return false;
                 }
             }
-            if (null !== $field->equal) {
+            if (empty($field->error) && !empty($field->equal)) {
                 $equalValue = $values[$field->equal] ?? null;
                 if ($equalValue !== $value) {
                     $this->errors[$name] = $field->equalError ?? Field::ERROR_EQUAL . " in $field->name";
