@@ -1,0 +1,13 @@
+{
+    "name": "evas-php/evas-validate",
+    "description": "Validation module",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "evasyakin",
+            "email": "e.vasyakin@itevas.ru"
+        }
+    ],
+    "require": {}
+}
