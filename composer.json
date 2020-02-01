@@ -1,14 +1,14 @@
 {
     "name": "evas-php/evas-validate",
-    "description": "Validation module",
+    "description": "Validation module (Field, Fieldset, Inner fieldsets, json fieldsets validators and html quote support)",
     "version": "1.0",
     "minimum-stability": "dev",
     "type": "library",
-    "license": "MIT",
+    "license": "CC BY 4.0",
     "authors": [
         {
-            "name": "evasyakin",
-            "email": "e.vasyakin@itevas.ru"
+            "name": "Egor Vasyakin",
+            "email": "egor@evas-php.com"
         }
     ],
     "require": {}
