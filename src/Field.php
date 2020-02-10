@@ -45,6 +45,7 @@ class Field
         'label' => 'name',
         'sameLabel' => 'same',
     ];
+    public static $message_keys_aliases = self::ERROR_KEYS_ALIASES;
 
     /**
      * @var string имя поля
