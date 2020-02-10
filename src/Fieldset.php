@@ -141,8 +141,8 @@ class Fieldset
      */
     public function isValid($values, $multipleErrors = false): bool
     {
+        assert(is_array($values) || is_object($values));
         if (is_object($values)) $values = (array) $values;
-        assert(is_array($values));
         $this->valuesBefore = &$values;
         $this->values = [];
         $this->errors()->clear();
@@ -192,11 +192,12 @@ class Fieldset
 
     /**
      * Проверка данных на валидность с выбрасом исключения в случае ошибки.
-     * @param array маппинг значений [поле => значение]
+     * @param array|object маппинг значений [поле => значение]
      * @throws ValidateException
      */
-    public function throwIfNotValid(array $values)
+    public function throwIfNotValid($values)
     {
+        assert(is_array($values) || is_object($values));
         if (false === $this->isValid($values)) {
             throw new ValidateException($this->errors()->first());
         }
