@@ -220,12 +220,12 @@ class Field
             $this->value = $value = $this->default;
             if (null === $value) {
                 // если обязательное поле пустое
-                if ($this->required == true) {
+                if (true === $this->required) {
                     return $this->setError(
                         $this->requiredError ?? $this->buildError(static::ERROR_REQUIRED)
                     );
-                } else if ($isset === false) {
-                // если необязательное поле не пришло
+                } else if (false === $isset) {
+                    // если необязательное поле не пришло
                     return true;
                 }
             }
