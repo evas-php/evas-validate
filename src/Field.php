@@ -4,7 +4,7 @@
  */
 namespace Evas\Validate;
 
-use Evas\Base\MessageVarsReplacerTrait;
+use Evas\Base\Helpers\MessageVarsReplacerTrait;
 use Evas\Validate\HtmlQuoteTrait;
 use Evas\Validate\ValidateException;
 
