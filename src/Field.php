@@ -70,7 +70,7 @@ class Field
     /**
      * @var bool проверять ли тип значения поля
      */
-    public $typeChecked = false;
+    public $checkType = false;
 
     /**
      * @var bool обязательность
@@ -232,7 +232,7 @@ class Field
         }
 
         // валидация типа поля
-        if (false !== $this->typeChecked) {
+        if (false !== $this->checkType) {
             if (! $this->checkType($value)) return false;
         }
 
