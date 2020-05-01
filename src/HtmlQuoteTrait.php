@@ -4,8 +4,11 @@
  */
 namespace Evas\Validate;
 
-if (!defined('ALLOWABLE_HTML_TAGS_DEFAULT')) define('ALLOWABLE_HTML_TAGS_DEFAULT', null);
-if (!defined('HTMLENTITIES_DEFAULT')) define('HTMLENTITIES_DEFAULT', false);
+/**
+ * Константы для свойств трейта по умолчанию.
+ */
+if (!defined('EVAS_ALLOWABLE_HTML_TAGS_DEFAULT')) define('EVAS_ALLOWABLE_HTML_TAGS_DEFAULT', null);
+if (!defined('EVAS_HTMLENTITIES_DEFAULT')) define('EVAS_HTMLENTITIES_DEFAULT', false);
 
 /**
  * Трейт экранирования html-тегов.
@@ -19,12 +22,12 @@ trait HtmlQuoteTrait
     /**
      * @var string|null общее правило поддерживаемых html-тегов
      */
-    public $allowableHtmlTags = ALLOWABLE_HTML_TAGS_DEFAULT;
+    public $allowableHtmlTags = EVAS_ALLOWABLE_HTML_TAGS_DEFAULT;
 
     /**
      * @var bool общее правило замены html-тегов на html-сущности
      */
-    public $htmlentities = HTMLENTITIES_DEFAULT;
+    public $htmlentities = EVAS_HTMLENTITIES_DEFAULT;
 
     /**
      * @var array маппинг правил поддерживания html-тегов для конкретных полей
@@ -42,12 +45,12 @@ trait HtmlQuoteTrait
     /**
      * @var string|null глобальное общее правило поддерживаемых html-тегов
      */
-    public static $allowableHtmlTagsGlobal = ALLOWABLE_HTML_TAGS_DEFAULT;
+    public static $allowableHtmlTagsGlobal = EVAS_ALLOWABLE_HTML_TAGS_DEFAULT;
 
     /**
      * @var bool глобальное общее правило замены html-тегов на html-сущности
      */
-    public static $htmlentitiesGlobal = HTMLENTITIES_DEFAULT;
+    public static $htmlentitiesGlobal = EVAS_HTMLENTITIES_DEFAULT;
 
     /**
      * @var array глобальный маппинг правил поддерживания html-тегов для конкретных полей
@@ -132,7 +135,7 @@ trait HtmlQuoteTrait
      */
     public function getAllowableHtmlTags(): ?string
     {
-        return $this->allowableHtmlTags !== ALLOWABLE_HTML_TAGS_DEFAULT 
+        return $this->allowableHtmlTags !== EVAS_ALLOWABLE_HTML_TAGS_DEFAULT 
             ? $this->allowableHtmlTags : static::$allowableHtmlTagsGlobal;
     }
 
@@ -142,7 +145,7 @@ trait HtmlQuoteTrait
      */
     public function getHtmlentities(): bool
     {
-        return $this->htmlentities !== HTMLENTITIES_DEFAULT 
+        return $this->htmlentities !== EVAS_HTMLENTITIES_DEFAULT 
             ? $this->htmlentities : static::$htmlentitiesGlobal;
     }
 
@@ -183,10 +186,10 @@ trait HtmlQuoteTrait
      */
     public function extendsQuote(object &$inner, string $name = null): object
     {
-        if (ALLOWABLE_HTML_TAGS_DEFAULT === $inner->getAllowableHtmlTags()) {
+        if (EVAS_ALLOWABLE_HTML_TAGS_DEFAULT === $inner->getAllowableHtmlTags()) {
             $inner->allowableHtmlTags = $this->getAllowableHtmlTags();
         }
-        if (HTMLENTITIES_DEFAULT === $inner->getHtmlentities()) {
+        if (EVAS_HTMLENTITIES_DEFAULT === $inner->getHtmlentities()) {
             $inner->htmlentities = $this->getHtmlentities();
         }
         static::mergeMaps($inner->allowableHtmlTagsMap, $this->getAllowableHtmlTagsMap());
@@ -218,11 +221,9 @@ trait HtmlQuoteTrait
                 : $this->getHtmlentities();
 
             if (null !== $allowableHtmlTags) {
-                echo get_called_class() . ": strip_tags for \"$name\" = $value<hr>";
                 $value = strip_tags($value, $allowableHtmlTags);
             }
             if (true === $htmlentities) {
-                echo get_called_class() . ": htmlentities for \"$name\" = $value<hr>";
                 $value = htmlentities($value);
             }
         }
