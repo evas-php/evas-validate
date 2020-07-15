@@ -1,6 +1,6 @@
 <?php
 /**
- * @package evas-php/evas-validate
+ * @package evas-php\evas-validate
  */
 namespace Evas\Validate;
 
