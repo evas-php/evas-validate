@@ -52,11 +52,19 @@ class Fieldset
     public $fieldClass = Field::class;
 
     /**
+     * Предустановленные поля валидатора.
+     * @return array|null
+     */
+    public function presetFields(): ?array
+    {}
+
+    /**
      * Конструктор.
-     * @param array [имя поля => валидатор] или [имя поля => параметры валидатора]
+     * @param array|null [имя поля => валидатор] или [имя поля => параметры валидатора]
      */
     public function __construct(array $fields = null)
     {
+        $fields = array_merge($this->presetFields() ?? [], $fields ?? []);
         if ($fields) $this->fields($fields);
         $this->errors = new Errors;
     }
