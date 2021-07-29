@@ -6,6 +6,7 @@
  */
 namespace Evas\Validate;
 
+use Evas\Base\Help\HooksTrait;
 use Evas\Validate\HtmlEscapingTrait;
 use Evas\Validate\Interfaces\ValidatableInterface;
 use Evas\Validate\ValidateErrorBuilder;
@@ -13,6 +14,9 @@ use Evas\Validate\ValidateException;
 
 class Field implements ValidatableInterface
 {
+    // подключаем поддержку произвольных хуков в наследуемых классах
+    use HooksTrait;
+
     /**
      * Подключаем поддержку экранирования html-тегов.
      */
@@ -94,12 +98,6 @@ class Field implements ValidatableInterface
     public $sameError;
 
     /**
-     * Хук после вызова конструктора валидатора поля.
-     */
-    public function afterConstruct()
-    {}
-
-    /**
      * Конструктор.
      * @param array|null параметры валидатора поля
      */
@@ -108,7 +106,7 @@ class Field implements ValidatableInterface
         if (!empty($props)) foreach ($props as $name => $value) {
             $this->$name = $value;
         }
-        $this->afterConstruct();
+        $this->hook('afterCreate');
     }
 
     /**
