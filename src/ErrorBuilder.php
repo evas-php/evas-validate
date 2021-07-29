@@ -21,10 +21,10 @@ class ErrorBuilder
     const ERROR_CODES_FILE = __DIR__.'/config/error_codes.php';
 
     /** @static array шаблоны ошибок по кодам */
-    protected static $templateByCodes = [];
+    protected static $templates = [];
 
     /** @static array коды ошибок по типам */
-    protected static $codeByTypes = [];
+    protected static $codes = [];
 
     /** @static StringTemplator шаблонизатор ошибок */
     public static $templator;
@@ -33,31 +33,31 @@ class ErrorBuilder
      * Получение маппинга шаблонов ошибок по кодам.
      * @return array
      */
-    public static function templateByCodes(): array
+    public static function templates(): array
     {
-        if (!static::$templateByCodes) {
-            static::$templateByCodes = include static::ERRORS_FILE;
+        if (!static::$templates) {
+            static::$templates = include static::ERRORS_FILE;
         }
-        return static::$templateByCodes;
+        return static::$templates;
     }
 
     /**
      * Получение маппинга кодов ошибок по типам.
      * @return array
      */
-    public static function codeByTypes(): array
+    public static function codes(): array
     {
-        if (!static::$codeByTypes) {
-            static::$codeByTypes = include_once static::ERROR_CODES_FILE;
+        if (!static::$codes) {
+            static::$codes = include_once static::ERROR_CODES_FILE;
         }
-        return static::$codeByTypes;
+        return static::$codes;
     }
 
     /**
-     * Обновление шаблонов ошибок по кодам из файла.
+     * Обновление шаблонов ошибок из файла.
      * @param string имя файла
      */
-    public static function includeErrorsByCodes(string $filename)
+    public static function includeTemplates(string $filename)
     {
         $filename = App::resolveByApp($filename);
         $updates = include $filename;
@@ -67,40 +67,9 @@ class ErrorBuilder
                 gettype($updates)
             ));
         }
-        static::updateErrorsByCodes($updates);
-    }
-
-    /**
-     * Обновление шаблонов ошибок по кодам.
-     * @param array маппинг шаблонов ошибок по кодам
-     */
-    public static function updateErrorsByCodes(array $templateByCodes)
-    {
-        foreach ($templateByCodes as $code => &$error) {
-            static::updateErrorByCode($code, $error);
-        }
-    }
-
-    /**
-     * Обновление шаблона ошибки по коду.
-     * @param int код ошибки
-     * @param string шаблон ошибки
-     */
-    public static function updateErrorByCode(int $code, string $error)
-    {
-        static::templateByCodes();
-        static::$templateByCodes[$code] = $error;
-    }
-
-    /**
-     * Обновление шаблонов ошибок по типам.
-     * @param array маппинг шаблонов ошибок по типам
-     */
-    public static function updateErrorsByTypes(array $errorByTypes)
-    {
-        foreach ($errorByTypes as $type => &$error) {
-            $code = static::codeByTypes()[$type] ?? null;
-            static::updateErrorByCode($code, $error);
+        static::templates();
+        foreach ($updates as $code => &$error) {
+            static::$templates[$code] = $error;
         }
     }
 
@@ -111,17 +80,7 @@ class ErrorBuilder
      */
     public static function templateByType(string $type): string
     {
-        return static::templateByCodes()[static::codeByTypes()[$type] ?? 0];
-    }
-
-    /**
-     * Получение шаблона ошибки по коду.
-     * @param int код ошибки
-     * @return string шаблон ошибки
-     */
-    public static function templateByCode(int $code): string
-    {
-        return static::templateByCodes()[$code] ?? static::templateByCodes()[0];
+        return static::templates()[static::codes()[$type] ?? 0];
     }
 
     /**
