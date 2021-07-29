@@ -162,6 +162,38 @@ class FieldTest extends \Codeception\Test\Unit
         $this->assertEquals($expected, $this->field->matches);
     }
 
+    public function testOptionsSetting()
+    {
+        $this->field = new Field([
+            'options' => 'invalid options',
+        ]);
+        $this->checkError('required', null);
+        $this->checkError('optionsSetting', 'random value');
+    }
+
+    public function testUndefinedType()
+    {
+        // свой кастомный тип с методом проверки
+        include_once __DIR__ . '/help/is_amount.php';
+        $this->field = new Field([
+            'type' => 'amount',
+            'checkType' => true,
+        ]);
+        $this->checkError('required', null);
+        $this->checkError('type', 'random');
+        $this->assertTrue($this->field->isValid('99.95'));
+        $this->assertTrue($this->field->isValid(99.95));
+        
+        // свой кастомный тип без метода проверки
+        $this->field = new Field([
+            'type' => 'unknown_type',
+            'checkType' => true,
+        ]);
+        $this->checkError('required', null);
+        $this->checkError('undefinedType', 'random');
+
+    }
+
     public function testThrowException()
     {
         $this->expectException(ValidateException::class);
