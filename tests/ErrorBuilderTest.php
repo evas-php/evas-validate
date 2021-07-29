@@ -32,6 +32,7 @@ class ErrorBuilderTest extends \Codeception\Test\Unit
 
     public function testGlobalTemplate()
     {
+        ErrorBuilder::templates();
         $defaultFile = EVAS_VALIDATE_ERRORS_FILE;
         $defaultValues = include $defaultFile;
         $ruFile = dirname($defaultFile) . '/errors_ru.php';
