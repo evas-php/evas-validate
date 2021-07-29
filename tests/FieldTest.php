@@ -15,11 +15,21 @@ Autoload::addNamespace('Evas\\Validate', 'vendor/evas-php/evas-validate/src');
 
 class FieldTest extends \Codeception\Test\Unit
 {
-    protected $fields;
+    protected $field;
 
     protected function templateByType(string $type)
     {
         return ValidateErrorBuilder::templateByType($type);
+    }
+
+    protected function makeEmailField()
+    {
+        return new Field([
+            'label' => 'Email',
+            'min' => 8,
+            'max' => 60,
+            'pattern' => '/^.{2,}@.{2,}\..{2,}$/',
+        ]);
     }
 
     protected function makeRatingField()
@@ -48,23 +58,6 @@ class FieldTest extends \Codeception\Test\Unit
         ]);
     }
 
-    protected function makeEmailField()
-    {
-        return new Field([
-            'label' => 'Email',
-            'min' => 8,
-            'max' => 60,
-            'pattern' => '/^.{2,}@.{2,}\..{2,}$/',
-            // 'lengthError' => 'Email должен быть длиной< от :min>< до :max> символов',
-            // 'patternError' => 'Проверьте правильность Email',
-        ]);
-    }
-
-    protected function _before()
-    {
-        $this->field = $this->makeEmailField();
-    }
-
     protected function checkError(string $type, $value)
     {
         $this->assertFalse($this->field->isValid($value));
@@ -76,6 +69,11 @@ class FieldTest extends \Codeception\Test\Unit
         $this->assertEquals($value, $this->field->valueBefore);
         // assert value
         $this->assertEquals($value, $this->field->value);
+    }
+
+    protected function _before()
+    {
+        $this->field = $this->makeEmailField();
     }
 
     public function testRequired()
