@@ -6,6 +6,7 @@
  */
 namespace Evas\Validate;
 
+use Evas\Base\App;
 use Evas\Base\Help\StringTemplator;
 
 if (!defined('EVAS_VALIDATE_ERRORS_FILE')) {
@@ -35,7 +36,7 @@ class ValidateErrorBuilder
     public static function templateByCodes(): array
     {
         if (!static::$templateByCodes) {
-            static::$templateByCodes = include_once static::ERRORS_FILE;
+            static::$templateByCodes = include static::ERRORS_FILE;
         }
         return static::$templateByCodes;
     }
@@ -53,6 +54,23 @@ class ValidateErrorBuilder
     }
 
     /**
+     * Обновление шаблонов ошибок по кодам из файла.
+     * @param string имя файла
+     */
+    public static function includeErrorsByCodes(string $filename)
+    {
+        $filename = App::resolveByApp($filename);
+        $updates = include $filename;
+        if (!is_array($updates)) {
+            throw new \Exception(sprintf(
+                'Validate errors map must be array, %s given',
+                gettype($updates)
+            ));
+        }
+        static::updateErrorsByCodes($updates);
+    }
+
+    /**
      * Обновление шаблонов ошибок по кодам.
      * @param array маппинг шаблонов ошибок по кодам
      */
@@ -64,13 +82,14 @@ class ValidateErrorBuilder
     }
 
     /**
-     * Обновление ошибки по коду.
+     * Обновление шаблона ошибки по коду.
      * @param int код ошибки
      * @param string шаблон ошибки
      */
     public static function updateErrorByCode(int $code, string $error)
     {
-        static::templateByCodes()[$code] = $error;
+        static::templateByCodes();
+        static::$templateByCodes[$code] = $error;
     }
 
     /**
