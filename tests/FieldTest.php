@@ -45,9 +45,7 @@ class FieldTest extends \Codeception\Test\Unit
     protected function makeWeekDaysField()
     {
         return new Field([
-            'options' => [
-                'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'
-            ],
+            'options' => ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
         ]);
     }
 
@@ -61,9 +59,9 @@ class FieldTest extends \Codeception\Test\Unit
     protected function checkError(string $type, $value)
     {
         $this->assertFalse($this->field->isValid($value));
-        $error = $this->templateByType($type);
-        // codecept_debug($this->field->error);
         // assert error
+        // codecept_debug($this->field->error);
+        $error = $this->templateByType($type);
         $this->assertEquals($error, $this->field->error);
         // assert value before
         $this->assertEquals($value, $this->field->valueBefore);
