@@ -6,7 +6,6 @@
  */
 namespace Evas\Validate;
 
-use \InvalidArgumentException;
 use Evas\Base\Help\HooksTrait;
 use Evas\Base\Help\PhpHelp;
 use Evas\Validate\ErrorBuilder;
@@ -24,7 +23,7 @@ class Fieldset implements ValidatableInterface
 {
     // подключаем поддержку произвольных хуков в наследуемых классах
     use HooksTrait;
-    
+
     /**
      * Подключаем поддержкуэкранирования html-тегов.
      */
@@ -71,22 +70,33 @@ class Fieldset implements ValidatableInterface
         $fields = array_merge($this->presetFields() ?? [], $fields ?? []);
         if ($fields) $this->fields($fields);
         $this->propsPreset();
-        if (!empty($props)) foreach ($props as $name => $value) {
+        if (!empty($props)) $this->setProps($props);
+        $this->hook('afterCreate');
+    }
+
+    /**
+     * Установка свойств набора полей.
+     * @param array параметры
+     * @return self
+     */
+    public function setProps(array $props)
+    {
+        foreach ($props as $name => $value) {
             $this->$name = $value;
         }
-        $this->hook('afterCreate');
+        return $this;
     }
 
     /**
      * Установка класса валидатора поля по умолчанию.
      * @param string имя класса поля по умолчанию
      * @return self
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     public function defaultFieldClass(string $defaultFieldClass)
     {
         if (!is_subclass_of($defaultFieldClass, Field::class)) {
-            throw new InvalidArgumentException(sprintf(
+            throw new \InvalidArgumentException(sprintf(
                 'Argument 1 passed to %s() must be an instance or a child of the %s, %s given', 
                 __METHOD__, Field::class, PhpHelp::getType($field)
             ));
@@ -113,7 +123,7 @@ class Fieldset implements ValidatableInterface
      * @param string имя поля
      * @param array|Field валидатор или параметры валидатора
      * @return self
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     public function field(string $name, $field)
     {
@@ -121,7 +131,7 @@ class Fieldset implements ValidatableInterface
             $field = new $this->defaultFieldClass($field);
         }
         if (!($field instanceof Field || $field instanceof self)) {
-            throw new InvalidArgumentException(sprintf(
+            throw new \InvalidArgumentException(sprintf(
                 'Argument 2 passed to %s() must be an array or an instance or a child of the %s or %s, %s given', 
                 __METHOD__, Field::class, Fieldset::class, 
                 PhpHelp::getType($field)
@@ -155,12 +165,15 @@ class Fieldset implements ValidatableInterface
      * Установка ошибки/ошибок в список.
      * @param string|array ключ поля или маппинг ошибок по полям
      * @param string|null ошибка, если не маппинг
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     public function setError($key, string $value = null)
     {
         if (!is_string($key) && !is_array($key)) {
-            throw new InvalidArgumentException(sprintf('Argument 1 $key must be a string or an array, %s given', gettype($key)));
+            throw new \InvalidArgumentException(sprintf(
+                'Argument 1 passed to %s() must be a string or an array, %s given',
+                __METHOD__, gettype($key)
+            ));
         }
         if (empty($this->name)) {
             $this->errors()->set($key, $value);
@@ -175,14 +188,14 @@ class Fieldset implements ValidatableInterface
     }
 
     /**
-     * Сборка ошибки вложенного валидатора полей.
+     * Сборка ошибки валидатора полей.
      * @param string тип ошибки
      * @return false
      */
     public function buildError(string $errorType)
     {
         $message = ErrorBuilder::build($errorType, $this);
-        $this->setError($this->name, $message);
+        $this->errors()->set($this->name, $message);
         return false;
     }
 
@@ -192,7 +205,7 @@ class Fieldset implements ValidatableInterface
      * @param bool|null проверять на все ошибки
      * @param bool|null вызывается ли из родительского набора полей
      * @return bool
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     public function isValid($values, bool $multipleErrors = false, bool $fromParent = false): bool
     {
@@ -200,8 +213,9 @@ class Fieldset implements ValidatableInterface
             if (true === $fromParent) {
                 return $this->buildError('valuesType');
             } else {
-                throw new InvalidArgumentException(sprintf('Argument 1 $values '
-                   .' must be an array or an object, %s given', gettype($values)));
+                throw new \InvalidArgumentException(sprintf(
+                    'Argument 1 passed to %s() must be an array or an object, %s given', __METHOD__, gettype($values)
+                ));
             }
         }
 
@@ -224,7 +238,7 @@ class Fieldset implements ValidatableInterface
                         $this->setError($field->errors()->map());
                         if (false === $multipleErrors) return false;
                     }
-                } catch (InvalidArgumentException $e) {
+                } catch (\InvalidArgumentException $e) {
                     $this->setError($name, $e->getMessage());
                     if (false === $multipleErrors) return false;
                 }
@@ -256,13 +270,13 @@ class Fieldset implements ValidatableInterface
     /**
      * Проверка данных на валидность с выбрасом исключения в случае ошибки.
      * @param array|object маппинг значений [поле => значение]
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      * @throws ValidateException
      */
     public function throwIfNotValid($values)
     {
         // if (!is_array($values) && !is_object($values)) {
-        //     throw new InvalidArgumentException(sprintf('Argument 1 $values must be an array or an object, %s given', gettype($key)));
+        //     throw new \InvalidArgumentException(sprintf('Argument 1 $values must be an array or an object, %s given', gettype($key)));
         // }
         if (false === $this->isValid($values)) {
             throw new ValidateException($this->errors()->first());
