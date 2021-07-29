@@ -151,7 +151,7 @@ class FieldsetTest extends \Codeception\Test\Unit
         $this->assertTrue($this->fieldset->isValid($data));
     }
 
-    public function testJsonFieldset()
+    public function testInnerJsonFieldset()
     {
         $jsonCheckError = function (string $key, string $type, $data) {
             if ($data && $data['filter']) {
