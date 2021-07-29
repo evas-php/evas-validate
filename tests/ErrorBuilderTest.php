@@ -9,33 +9,72 @@ namespace Evas\Validate\tests;
 use Codeception\Util\Autoload;
 use Evas\Validate\ErrorBuilder;
 use Evas\Validate\Field;
+use Evas\Validate\Fieldset;
 use Evas\Validate\Fields\EmailField;
+use Evas\Validate\JsonFieldset;
 
 Autoload::addNamespace('Evas\\Validate', 'vendor/evas-php/evas-validate/src');
 
 class ErrorBuilderTest extends \Codeception\Test\Unit
 {
-    public function testLocalTemplate()
+    /**
+     * Тест локальных шаблонов ошибок полей.
+     */
+    public function testLocalFieldTemplate()
     {
+        $customLengthError = 'Email должен быть длиной от 8 до 60 символов';
+        $customPatternError = 'Проверьте правильность Email';
         $field = new EmailField([
-            'lengthError' => 'Email должен быть длиной< от :min>< до :max> символов',
-            'patternError' => 'Проверьте правильность Email',
+            'lengthError' => $customLengthError,
+            'patternError' => $customPatternError,
         ]);
-        $expectedLengthError = 'Email должен быть длиной от 8 до 60 символов';
         $this->assertFalse($field->isValid('test'));
-        $this->assertEquals($expectedLengthError, $field->error);
+        $this->assertEquals($customLengthError, $field->error);
 
-        $expectedPatternError = 'Проверьте правильность Email';
         $this->assertFalse($field->isValid('test@test.t'));
-        $this->assertEquals($expectedPatternError, $field->error);
+        $this->assertEquals($customPatternError, $field->error);
     }
 
-    public function testGlobalTemplate()
+    /**
+     * Тест локальных шаблонов ошибок набора полей.
+     */
+    public function testLocalFieldsetTemplate()
+    {
+        $fieldset = new Fieldset(null, [
+            'valuesTypeError' => 'valuesTypeCustomError',
+        ]);
+        $this->assertFalse($fieldset->isValid(null));
+        $this->assertEquals('valuesTypeCustomError', $fieldset->errors()->last());
+    }
+
+    /**
+     * Тест локальных шаблонов ошибок json набора полей.
+     */
+    public function testLocalJsonFieldsetTemplate()
+    {
+        $fieldset = new JsonFieldset(null, [
+            'jsonEmptyError' => 'jsonEmptyCustomError',
+            'jsonParseError' => 'jsonParseCustomError',
+            'jsonTypeError' => 'jsonTypeCustomError',
+        ]);
+        $this->assertFalse($fieldset->isValid(null));
+        $this->assertEquals('jsonEmptyCustomError', $fieldset->errors()->last());
+
+        $this->assertFalse($fieldset->isValid('lol'));
+        $this->assertEquals('jsonParseCustomError', $fieldset->errors()->last());
+
+        $this->assertFalse($fieldset->isValid(['lol']));
+        $this->assertEquals('jsonTypeCustomError', $fieldset->errors()->last());
+    }
+
+    /**
+     * Тест изменения глобальных шаблонов ошибок.
+     */
+    public function testUpdateGlobalTemplate()
     {
         ErrorBuilder::templates();
-        $defaultFile = EVAS_VALIDATE_ERRORS_FILE;
-        $defaultValues = include $defaultFile;
-        $ruFile = dirname($defaultFile) . '/errors_ru.php';
+        $defaultValues = include EVAS_VALIDATE_ERRORS_FILE;
+        $ruFile = dirname(EVAS_VALIDATE_ERRORS_FILE) . '/errors_ru.php';
         $ruValues = include $ruFile;
 
         $actual = ErrorBuilder::templates();
@@ -45,8 +84,31 @@ class ErrorBuilderTest extends \Codeception\Test\Unit
         $actual = ErrorBuilder::templates();
         $this->assertEquals($ruValues, $actual);
 
-        ErrorBuilder::includeTemplates($defaultFile);
+        ErrorBuilder::includeTemplates(EVAS_VALIDATE_ERRORS_FILE);
         $actual = ErrorBuilder::templates();
         $this->assertEquals($defaultValues, $actual);
+    }
+
+    /**
+     * Тест глобальных шаблонов ошибок.
+     */
+    public function testGlobalTemplate()
+    {
+        ErrorBuilder::templates();
+        $ruFile = dirname(EVAS_VALIDATE_ERRORS_FILE) . '/errors_ru.php';
+
+        ErrorBuilder::includeTemplates($ruFile);
+
+        $expectedLengthError = 'Значение поля "Email" должно быть длиной от 8 до 60 символов';
+        $expectedPatternError = 'Проверьте правильность поля "Email"';
+        $field = new EmailField;
+        $this->assertFalse($field->isValid('test'));
+        $this->assertEquals($expectedLengthError, $field->error);
+
+        $this->assertFalse($field->isValid('test@test.t'));
+        $this->assertEquals($expectedPatternError, $field->error);
+
+        // возвращаем исходные ошибки валидации
+        ErrorBuilder::includeTemplates(EVAS_VALIDATE_ERRORS_FILE);
     }
 }
