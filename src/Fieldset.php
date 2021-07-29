@@ -7,6 +7,7 @@
 namespace Evas\Validate;
 
 use \InvalidArgumentException;
+use Evas\Base\Help\HooksTrait;
 use Evas\Base\Help\PhpHelp;
 use Evas\Validate\Errors;
 use Evas\Validate\HtmlEscapingTrait;
@@ -21,6 +22,9 @@ if (!defined('EVAS_VALIDATE_DEFAULT_FIELD_CLASS')) {
 
 class Fieldset implements ValidatableInterface
 {
+    // подключаем поддержку произвольных хуков в наследуемых классах
+    use HooksTrait;
+    
     /**
      * Подключаем поддержкуэкранирования html-тегов.
      */
