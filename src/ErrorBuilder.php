@@ -13,7 +13,7 @@ if (!defined('EVAS_VALIDATE_ERRORS_FILE')) {
     define('EVAS_VALIDATE_ERRORS_FILE', __DIR__.'/config/errors_default.php');
 }
 
-class ValidateErrorBuilder
+class ErrorBuilder
 {
     /** @static string путь к файлу шаблонов ошибок по кодам */
     const ERRORS_FILE = EVAS_VALIDATE_ERRORS_FILE;

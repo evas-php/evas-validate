@@ -7,9 +7,9 @@
 namespace Evas\Validate;
 
 use Evas\Base\Help\HooksTrait;
+use Evas\Validate\ErrorBuilder;
 use Evas\Validate\HtmlEscapingTrait;
 use Evas\Validate\Interfaces\ValidatableInterface;
-use Evas\Validate\ValidateErrorBuilder;
 use Evas\Validate\ValidateException;
 
 class Field implements ValidatableInterface
@@ -122,7 +122,7 @@ class Field implements ValidatableInterface
      */
     public function buildError(string $errorType): bool
     {
-        $this->error = ValidateErrorBuilder::build(
+        $this->error = ErrorBuilder::build(
             $errorType, $this, static::MESSAGE_KEY_ALIASES
         );
         return false;

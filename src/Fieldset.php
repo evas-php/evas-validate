@@ -9,11 +9,11 @@ namespace Evas\Validate;
 use \InvalidArgumentException;
 use Evas\Base\Help\HooksTrait;
 use Evas\Base\Help\PhpHelp;
+use Evas\Validate\ErrorBuilder;
 use Evas\Validate\Errors;
 use Evas\Validate\HtmlEscapingTrait;
 use Evas\Validate\Field;
 use Evas\Validate\Interfaces\ValidatableInterface;
-use Evas\Validate\ValidateErrorBuilder;
 use Evas\Validate\ValidateException;
 
 if (!defined('EVAS_VALIDATE_DEFAULT_FIELD_CLASS')) {
@@ -181,7 +181,7 @@ class Fieldset implements ValidatableInterface
      */
     public function buildError(string $errorType)
     {
-        $message = ValidateErrorBuilder::build($errorType, $this);
+        $message = ErrorBuilder::build($errorType, $this);
         $this->setError($this->name, $message);
         return false;
     }

@@ -9,11 +9,11 @@ namespace Evas\Validate\tests;
 use Codeception\Util\Autoload;
 use Evas\Validate\Field;
 use Evas\Validate\Fields\EmailField;
-use Evas\Validate\ValidateErrorBuilder;
+use Evas\Validate\ErrorBuilder;
 
 Autoload::addNamespace('Evas\\Validate', 'vendor/evas-php/evas-validate/src');
 
-class ValidateErrorBuilderTest extends \Codeception\Test\Unit
+class ErrorBuilderTest extends \Codeception\Test\Unit
 {
     public function testLocalTemplate()
     {
@@ -37,15 +37,15 @@ class ValidateErrorBuilderTest extends \Codeception\Test\Unit
         $ruFile = dirname($defaultFile) . '/errors_ru.php';
         $ruValues = include $ruFile;
 
-        $actual = ValidateErrorBuilder::templateByCodes();
+        $actual = ErrorBuilder::templateByCodes();
         $this->assertEquals($defaultValues, $actual);
 
-        ValidateErrorBuilder::includeErrorsByCodes($ruFile);
-        $actual = ValidateErrorBuilder::templateByCodes();
+        ErrorBuilder::includeErrorsByCodes($ruFile);
+        $actual = ErrorBuilder::templateByCodes();
         $this->assertEquals($ruValues, $actual);
 
-        ValidateErrorBuilder::includeErrorsByCodes($defaultFile);
-        $actual = ValidateErrorBuilder::templateByCodes();
+        ErrorBuilder::includeErrorsByCodes($defaultFile);
+        $actual = ErrorBuilder::templateByCodes();
         $this->assertEquals($defaultValues, $actual);
     }
 }
