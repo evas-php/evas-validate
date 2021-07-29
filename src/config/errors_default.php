@@ -12,7 +12,7 @@ return [
     4 => 'error.validate.field.length',
     5 => 'error.validate.field.range',
     6 => 'error.validate.field.pattern',
-    7 => 'error.validate.field.equals',
+    7 => 'error.validate.field.same',
     8 => 'error.validate.field.options',
     9 => 'error.validate.field.optionsSetting',
     // ошибки валидации набора полей
