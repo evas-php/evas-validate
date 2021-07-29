@@ -7,10 +7,13 @@
 namespace Evas\Validate\tests;
 
 use Codeception\Util\Autoload;
+use Evas\Validate\ErrorBuilder;
 use Evas\Validate\Field;
 use Evas\Validate\Fieldset;
+use Evas\Validate\Fields\DateField;
 use Evas\Validate\Fields\EmailField;
-use Evas\Validate\ErrorBuilder;
+use Evas\Validate\JsonFieldset;
+use Evas\Validate\ValidateException;
 
 Autoload::addNamespace('Evas\\Validate', 'vendor/evas-php/evas-validate/src');
 
@@ -32,6 +35,26 @@ class FieldsetTest extends \Codeception\Test\Unit
                 'max' => 30,
                 'same' => 'password_repeat',
                 'sameLabel' => 'Password Repeat',
+            ]),
+        ]);
+    }
+
+    protected function makeFieldsetWithFilter()
+    {
+        return new Fieldset([
+            'filter' => new Fieldset([
+                'from' => new DateField,
+                'to' => new DateField,
+            ]),
+        ]);
+    }
+
+    protected function makeFieldsetWithJsonFilter()
+    {
+        return new Fieldset([
+            'filter' => new JsonFieldset([
+                'from' => new DateField,
+                'to' => new DateField,
             ]),
         ]);
     }
@@ -109,5 +132,60 @@ class FieldsetTest extends \Codeception\Test\Unit
         $this->assertEquals($expected, $actual->map());
         $this->assertEquals(array_values($expected), $actual->list());
         $this->assertEquals(array_keys($expected), $actual->keys());
+    }
+
+    public function testInnerFieldset()
+    {
+        $this->fieldset = $this->makeFieldsetWithFilter();
+        $this->checkError('filter.from', 'required', []);
+        $this->checkError('filter.from', 'required', ['filter' => []]);
+        $this->checkError('filter.from', 'required', ['filter' => '']);
+        $this->checkError('filter', 'valuesType', ['filter' => 'kek']);
+
+        $data = ['filter' => ['from' => '2021']];
+        $this->checkError('filter.from', 'pattern', $data);
+        $data = ['filter' => ['from' => '2021-07-29']];
+        $this->checkError('filter.to', 'required', $data);
+
+        $data['filter']['to'] = $data['filter']['from'];
+        $this->assertTrue($this->fieldset->isValid($data));
+    }
+
+    public function testJsonFieldset()
+    {
+        $jsonCheckError = function (string $key, string $type, $data) {
+            if ($data && $data['filter']) {
+                $data['filter'] = json_encode($data['filter']);
+            }
+            return $this->checkError($key, $type, $data);
+        };
+        $jsonCheckError = $jsonCheckError->bindTo($this);
+
+        $this->fieldset = $this->makeFieldsetWithJsonFilter();
+        $jsonCheckError('filter', 'jsonEmpty', []);
+        $this->checkError('filter', 'jsonEmpty', ['filter' => '']);
+        $this->checkError('filter', 'jsonEmpty', ['filter' => []]);
+        $this->checkError('filter', 'jsonType', ['filter' => ['some']]);
+        $jsonCheckError('filter', 'jsonParse', ['filter' => 'kek']);
+
+        $data = ['filter' => ['from' => null]];
+        $jsonCheckError('filter.from', 'required', $data);
+
+        $data = ['filter' => ['from' => '2021']];
+        $jsonCheckError('filter.from', 'pattern', $data);
+
+        $data = ['filter' => ['from' => '2021-07-29']];
+        $jsonCheckError('filter.to', 'required', $data);
+
+        $data['filter']['to'] = $data['filter']['from'];
+        $data['filter'] = json_encode($data['filter']);
+        $this->assertTrue($this->fieldset->isValid($data));
+    }
+
+    public function testThrowException()
+    {
+        $this->expectException(ValidateException::class);
+        $this->expectExceptionMessage($this->templateByType('length'));
+        $this->fieldset->throwIfNotValid(['email' => 'test']);
     }
 }
