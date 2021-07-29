@@ -7,9 +7,10 @@
 namespace Evas\Validate\tests;
 
 use Codeception\Util\Autoload;
+use Evas\Validate\ErrorBuilder;
 use Evas\Validate\Field;
 use Evas\Validate\Fields\EmailField;
-use Evas\Validate\ErrorBuilder;
+use Evas\Validate\ValidateException;
 
 Autoload::addNamespace('Evas\\Validate', 'vendor/evas-php/evas-validate/src');
 
@@ -161,10 +162,10 @@ class FieldTest extends \Codeception\Test\Unit
         $this->assertEquals($expected, $this->field->matches);
     }
 
-    public function testSome()
+    public function testThrowException()
     {
-        $field = new EmailField;
-        $field->isValid('test');
-        codecept_debug($field->error);
+        $this->expectException(ValidateException::class);
+        $this->expectExceptionMessage($this->templateByType('length'));
+        $this->field->throwIfNotValid('test');
     }
 }
