@@ -7,9 +7,9 @@
 namespace Evas\Validate\tests;
 
 use Codeception\Util\Autoload;
+use Evas\Validate\ErrorBuilder;
 use Evas\Validate\Field;
 use Evas\Validate\Fields\EmailField;
-use Evas\Validate\ErrorBuilder;
 
 Autoload::addNamespace('Evas\\Validate', 'vendor/evas-php/evas-validate/src');
 
