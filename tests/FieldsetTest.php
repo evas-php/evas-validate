@@ -40,16 +40,13 @@ class FieldsetTest extends \Codeception\Test\Unit
     {
         // assert value before
         $this->assertEquals($values, $this->fieldset->valuesBefore);
-        // assert value
-        // $this->assertEquals($values, $this->fieldset->values);
     }
 
     protected function checkError(string $key, string $type, $values)
     {
         $this->assertFalse($this->fieldset->isValid($values));
-        $error = $this->templateByType($type);
-        // codecept_debug($this->fieldset->errors()->last());
         // assert error
+        $error = $this->templateByType($type);
         $this->assertEquals($error, $this->fieldset->errors()->last());
         $this->assertEquals($key, $this->fieldset->errors()->lastKey());
         $this->checkValues($values);
@@ -58,6 +55,7 @@ class FieldsetTest extends \Codeception\Test\Unit
     protected function checkErrors(array $types, $values)
     {
         $this->assertFalse($this->fieldset->isValid($values, true));
+        // assert error
         $errors = [];
         foreach ($types as $name => $type) {
             $errors[$name] = $this->templateByType($type);
@@ -84,5 +82,32 @@ class FieldsetTest extends \Codeception\Test\Unit
 
         $data['password_repeat'] = $data['password'];
         $this->assertTrue($this->fieldset->isValid($data));
+    }
+
+    public function testSingleError()
+    {
+        $invalidData = ['email' => 'test@test.t', 'password' => '1234'];
+        $expected = [
+            'email' => $this->templateByType('pattern'),
+        ];
+        $this->assertFalse($this->fieldset->isValid($invalidData));
+        $actual = $this->fieldset->errors();
+        $this->assertEquals($expected, $actual->map());
+        $this->assertEquals(array_values($expected), $actual->list());
+        $this->assertEquals(array_keys($expected), $actual->keys());
+    }
+
+    public function testMultipleErrors()
+    {
+        $invalidData = ['email' => 'test@test.t', 'password' => '1234'];
+        $expected = [
+            'email' => $this->templateByType('pattern'),
+            'password' => $this->templateByType('length'),
+        ];
+        $this->assertFalse($this->fieldset->isValid($invalidData, true));
+        $actual = $this->fieldset->errors();
+        $this->assertEquals($expected, $actual->map());
+        $this->assertEquals(array_values($expected), $actual->list());
+        $this->assertEquals(array_keys($expected), $actual->keys());
     }
 }
