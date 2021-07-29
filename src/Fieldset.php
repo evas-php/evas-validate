@@ -195,7 +195,7 @@ class Fieldset implements ValidatableInterface
     public function buildError(string $errorType)
     {
         $message = ErrorBuilder::build($errorType, $this);
-        $this->errors()->set($this->name, $message);
+        $this->errors()->set($this->name ?? '', $message);
         return false;
     }
 
@@ -210,13 +210,7 @@ class Fieldset implements ValidatableInterface
     public function isValid($values, bool $multipleErrors = false, bool $fromParent = false): bool
     {
         if (!is_array($values) && !is_object($values)) {
-            if (true === $fromParent) {
-                return $this->buildError('valuesType');
-            } else {
-                throw new \InvalidArgumentException(sprintf(
-                    'Argument 1 passed to %s() must be an array or an object, %s given', __METHOD__, gettype($values)
-                ));
-            }
+            return $this->buildError('valuesType');
         }
 
         if (is_object($values)) $values = (array) $values;
