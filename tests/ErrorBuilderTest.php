@@ -37,15 +37,15 @@ class ErrorBuilderTest extends \Codeception\Test\Unit
         $ruFile = dirname($defaultFile) . '/errors_ru.php';
         $ruValues = include $ruFile;
 
-        $actual = ErrorBuilder::templateByCodes();
+        $actual = ErrorBuilder::templates();
         $this->assertEquals($defaultValues, $actual);
 
-        ErrorBuilder::includeErrorsByCodes($ruFile);
-        $actual = ErrorBuilder::templateByCodes();
+        ErrorBuilder::includeTemplates($ruFile);
+        $actual = ErrorBuilder::templates();
         $this->assertEquals($ruValues, $actual);
 
-        ErrorBuilder::includeErrorsByCodes($defaultFile);
-        $actual = ErrorBuilder::templateByCodes();
+        ErrorBuilder::includeTemplates($defaultFile);
+        $actual = ErrorBuilder::templates();
         $this->assertEquals($defaultValues, $actual);
     }
 }
