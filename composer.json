@@ -2,7 +2,7 @@
     "name": "evas-php/evas-validate",
     "description": "Validation module (Field, Fieldset, Inner fieldsets, json fieldsets validators and html quote support)",
     "keywords": ["validation", "validator", "validate", "evas-php"],
-    "version": "1.0",
+    "version": "1.1",
     "type": "library",
     "license": "CC-BY-4.0",
     "authors": [
