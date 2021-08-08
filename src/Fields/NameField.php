@@ -1,6 +1,6 @@
 <?php
 /**
- * Валидатор поля имя.
+ * Валидатор имени.
  * @package evas-php/evas-validate
  * @author Egor Vasyakin <egor@evas-php.com>
  */
@@ -11,8 +11,6 @@ use Evas\Validate\Field;
 class NameField extends Field
 {
     public $min = 2;
-    public $max = 60;
-    // public $pattern = '/^([a-zA-Zа-яА-Я]{2,} )+?$/u';
-    // public $pattern = '/^[а-яёЁА-Я]*$/u';
-    public $pattern = '/^([a-zA-Zа-яёЁА-Я]{2,} ?)+$/u';
+    public $max = 30;
+    public $pattern = '/^[a-zA-Zа-яёЁА-Я]+$/u';
 }
