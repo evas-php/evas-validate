@@ -224,7 +224,7 @@ class Fieldset implements ValidatableInterface
 
             $isset = isset($values[$name]);
             $value = $values[$name] ?? null;
-            if ($field instanceof static) {
+            if ($field instanceof Fieldset) {
                 // валидируем вложенный набор полей
                 if (empty($value)) $value = [];
                 try {
