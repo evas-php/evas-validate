@@ -258,6 +258,7 @@ class Fieldset implements ValidatableInterface
         if (!empty($this->errors()->has())) {
             return false;
         }
+        $this->hook('afterValidate');
         return true;
     }
 
