@@ -11,7 +11,7 @@ use Evas\Validate\Field;
 class PhoneField extends Field
 {
     public $min = 10;
-    public $max = 13;
+    public $max = 16;
     public $pattern = '/(\d*)(\d{10})$/';
 
     public function prepareValue()
