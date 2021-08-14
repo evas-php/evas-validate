@@ -12,5 +12,5 @@ class LoginField extends Field
 {
     public $min = 4;
     public $max = 20;
-    public $pattern = '/^[a-zA-Z_.-]+$/';
+    public $pattern = '/^[a-zA-Z0-9_.-]+$/';
 }
