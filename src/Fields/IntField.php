@@ -10,6 +10,5 @@ use Evas\Validate\Field;
 
 class IntField extends Field
 {
-    public $type = ['string', 'int'];
     public $pattern = '/^\d+$/';
 }
