@@ -103,6 +103,7 @@ class Field implements ValidatableInterface
      */
     public function __construct(array $props = null)
     {
+        $this->hook('beforeCreate');
         if (!empty($props)) foreach ($props as $name => $value) {
             $this->$name = $value;
         }
