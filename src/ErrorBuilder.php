@@ -117,36 +117,4 @@ class ErrorBuilder
             $template ?? static::templateByType($type), $context, $keyAliases
         );
     }
-
-
-    // public $code;
-    // public $type;
-    // public $message;
-
-    // public function __construct(int $code, string $message)
-    // {
-    //     $this->code = $code;
-    //     $this->type = static::TYPE_BY_CODES[$code] ?? static::TYPE_BY_CODES[0];
-    //     $this->message = $message;
-    // }
-
-    // public static function getCode(): int
-    // {
-    //     return $this->code;
-    // }
-
-    // public static function getType(): string
-    // {
-    //     return $this->type;
-    // }
-
-    // public static function getMessage(): string
-    // {
-    //     return $this->message;
-    // }
-
-    // public function __toString()
-    // {
-    //     return $this->getMessage();
-    // }
 }
