@@ -209,11 +209,12 @@ class Fieldset implements ValidatableInterface
      */
     public function isValid($values, bool $multipleErrors = false, bool $fromParent = false): bool
     {
-        if (!is_array($values) && !is_object($values)) {
+        if (!is_array($values) && !is_object($values) && !is_null($values)) {
             return $this->buildError('valuesType');
         }
 
         if (is_object($values)) $values = (array) $values;
+        else if (is_null($values)) $values = [];
         $this->valuesBefore = &$values;
         $this->values = [];
         $this->errors()->clear();
