@@ -269,13 +269,15 @@ class Field implements ValidatableInterface
      * Проверка значения на валидность полю с выбрасом исключения.
      * @param mixed значение
      * @param bool пришло ли поле
+     * @return self
      * @throws ValidateException
      */
-    public function throwIfNotValid($value, bool $isset = true)
+    public function throwIfNotValid($value, bool $isset = true): ValidatableInterface
     {
         if (false === $this->isValid($value, $isset)) {
             throw new ValidateException($this->error);
         }
+        return $this;
     }
 
     /**
