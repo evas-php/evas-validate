@@ -266,10 +266,11 @@ class Fieldset implements ValidatableInterface
     /**
      * Проверка данных на валидность с выбрасом исключения в случае ошибки.
      * @param array|object маппинг значений [поле => значение]
+     * @return self
      * @throws \InvalidArgumentException
      * @throws ValidateException
      */
-    public function throwIfNotValid($values)
+    public function throwIfNotValid($values): ValidatableInterface
     {
         // if (!is_array($values) && !is_object($values)) {
         //     throw new \InvalidArgumentException(sprintf('Argument 1 $values must be an array or an object, %s given', gettype($key)));
@@ -277,5 +278,6 @@ class Fieldset implements ValidatableInterface
         if (false === $this->isValid($values)) {
             throw new ValidateException($this->errors()->first());
         }
+        return $this;
     }
 }
