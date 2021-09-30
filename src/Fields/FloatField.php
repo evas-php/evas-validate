@@ -11,5 +11,5 @@ use Evas\Validate\Field;
 class FloatField extends Field
 {
     public $type = ['string', 'float'];
-    public $pattern = '/^\d+\.\d+$/';
+    public $pattern = '/^\d+\.?\d*$/';
 }
