@@ -1,6 +1,6 @@
 <?php
 /**
- * Ошибка валидации.
+ * Ошибки валидации набора полей.
  * @package evas-php\evas-validate
  * @author Egor Vasyakin <egor@evas-php.com>
  */
