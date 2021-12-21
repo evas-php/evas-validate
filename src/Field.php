@@ -238,8 +238,6 @@ class Field implements ValidatableInterface
                 return $this->buildError('optionsSetting');
             }
             if (!in_array($value, $this->options)) {
-                echo $value . '<br>';
-                var_dump($this->options);
                 return $this->buildError('options');
             }
         }
