@@ -14,7 +14,7 @@ class PhoneField extends Field
     public $max = 16;
     public $pattern = '/(\d*)(\d{10})$/';
 
-    public function prepareValue()
+    protected function prepareValue()
     {
         $pattern = '/\d/';
         preg_match_all($pattern, $this->value, $matches);
