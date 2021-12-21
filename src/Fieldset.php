@@ -57,8 +57,10 @@ class Fieldset implements ValidatableInterface
     /**
      * Предустановка свойств валидатора.
      */
-    public function propsPreset()
-    {}
+    public function propsPreset(): ?array
+    {
+        return null;
+    }
 
     /**
      * Конструктор.
@@ -69,7 +71,7 @@ class Fieldset implements ValidatableInterface
     {
         $fields = array_merge($this->presetFields() ?? [], $fields ?? []);
         if ($fields) $this->fields($fields);
-        $this->propsPreset();
+        $props = array_merge($this->propsPreset() ?? [], $props ?? []);
         if (!empty($props)) $this->setProps($props);
         $this->hook('afterCreate');
     }
