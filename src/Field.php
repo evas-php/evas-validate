@@ -69,6 +69,9 @@ class Field implements ValidatableInterface
     /** @var string тип поля для которого отсутствует функция проверки типа*/
     public $undefinedType;
 
+    /** @var callable колбэк для подготовки значения к валидации */
+    public $prepareValue;
+
 
     /** @var string сообщение об отсутствии значения, если поле обязательно */
     public $requiredError;
@@ -112,9 +115,31 @@ class Field implements ValidatableInterface
 
     /**
      * Подготовка значения к валидации.
+     * @param mixed|null значение
+     * @return mixed|null подготовленное значение
      */
-    public function prepareValue()
-    {}
+    protected function prepareValue($value)
+    {
+        // обрезание пробельных символов по краям, если включено
+        if (true === $this->trim && is_string($value)) $value = trim($value);
+        $cb = $this->prepareValue;
+        if (!empty($cb)) {
+            $cb->bindTo($this);
+            return $cb($value);
+        }
+        return $value;
+    }
+
+    /**
+     * Установка значения валидации.
+     * @param mixed|null значение
+     * @return mixed|null установленное значение
+     */
+    protected function setValue(&$value)
+    {
+        if ($value !== null) $this->value = $this->prepareValue($value);
+        $value = $this->value;
+    }
 
     /**
      * Сборка ошибки по типу.
@@ -132,11 +157,12 @@ class Field implements ValidatableInterface
 
     /**
      * Проверка типа значения.
-     * @param mixed значение для проверки
+     * @param mixed|null значение для проверки
      * @return bool
      */
-    public function checkType($value): bool
+    public function checkType($value = null): bool
     {
+        $this->setValue($value);
         $type = $this->type;
         if (is_string($type)) $type = [$type];
         $error = 'type';
@@ -156,18 +182,17 @@ class Field implements ValidatableInterface
 
     /**
      * Проверка длины строки или диапазона значения.
-     * @param mixed значение для проверки
-     * @param bool|null обрезать ли пробельные символы по краям
+     * @param mixed|null значение для проверки
      * @return bool
      */
-    public function checkLength($value, bool $fromValidate = false): bool
+    public function checkLength($value = null): bool
     {
+        $this->setValue($value);
         if (!is_string($value) && !is_numeric($value) && !is_null($value)) {
             return $this->checkType($value);
         }
         if (null !== $this->min || null !== $this->max) {
             if ('string' === $this->type) {
-                if (true === $this->trim && !$fromValidate) $value = trim($value);
                 $len = mb_strlen($value);
                 $error = 'length';
             } else {
@@ -186,16 +211,15 @@ class Field implements ValidatableInterface
 
     /**
      * Валидация по регулярке.
-     * @param mixed значение для проверки
-     * @param bool|null обрезать ли пробельные символы по краям
+     * @param mixed|null значение для проверки
      * @return bool
      */
-    public function checkPattern($value, bool $fromValidate = false): bool
+    public function checkPattern($value = null): bool
     {
+        $this->setValue($value);
         if (!is_string($value) && !is_numeric($value) && !is_null($value)) {
             return $this->checkType($value);
         }
-        if (true === $this->trim && !$fromValidate) $value = trim($value);
         return !empty($this->pattern)
          && !preg_match($this->pattern, $value, $this->matches)
          ? $this->buildError('pattern') : true;
@@ -203,18 +227,19 @@ class Field implements ValidatableInterface
 
     /**
      * Проверка соответсвия опциям.
-     * @param mixed значение для проверки
-     * @param bool|null обрезать ли пробельные символы по краям
+     * @param mixed|null значение для проверки
      * @return bool
      */
-    public function checkOptions($value, bool $fromValidate = false): bool
+    public function checkOptions($value = null): bool
     {
+        $this->setValue($value);
         if (!empty($this->options)) {
             if (!is_array($this->options)) {
                 return $this->buildError('optionsSetting');
             }
-            if (true === $this->trim && !$fromValidate) $value = trim($value);
             if (!in_array($value, $this->options)) {
+                echo $value . '<br>';
+                var_dump($this->options);
                 return $this->buildError('options');
             }
         }
@@ -231,8 +256,7 @@ class Field implements ValidatableInterface
     {
         $this->error = null;
         $this->valueBefore = $value;
-        $this->value = &$value;
-        $this->prepareValue();
+        $this->setValue($value);
 
         // если значение пустое
         if (null === $value) {
@@ -253,14 +277,14 @@ class Field implements ValidatableInterface
         // экранирование html-тегов в строке
         $value = $this->escapeHtml($value, $this->name);
 
-        // обрезание пробельных символов по краям
-        if (true === $this->trim) $value = trim($value);
         // валидация длины строки или попадания числа в диапазон
         // валидация по регулярке
         // валидаци опций
-        if (!$this->checkLength($value, true)) return false;
-        if (!$this->checkPattern($value, true)) return false;
-        if (!$this->checkOptions($value, true)) return false;
+        if (!$this->checkLength()) return false;
+        if (!$this->checkPattern()) return false;
+        if (!$this->checkOptions()) return false;
+
+        $this->hook('afterValidate');
 
         return true;
     }
