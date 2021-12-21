@@ -10,7 +10,7 @@ use Evas\Base\App;
 use Evas\Base\Help\StringTemplator;
 
 if (!defined('EVAS_VALIDATE_ERRORS_FILE')) {
-    define('EVAS_VALIDATE_ERRORS_FILE', __DIR__.'/config/errors_default.php');
+    define('EVAS_VALIDATE_ERRORS_FILE', __DIR__.'/../config/errors_default.php');
 }
 
 class ErrorBuilder
@@ -18,7 +18,7 @@ class ErrorBuilder
     /** @static string путь к файлу шаблонов ошибок по кодам */
     const ERRORS_FILE = EVAS_VALIDATE_ERRORS_FILE;
     /** @static string путь к файлу кодов ошибок по типам */
-    const ERROR_CODES_FILE = __DIR__.'/config/error_codes.php';
+    const ERROR_CODES_FILE = __DIR__.'/../config/error_codes.php';
 
     /** @static array шаблоны ошибок по кодам */
     protected static $templates = [];
