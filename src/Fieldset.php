@@ -100,7 +100,7 @@ class Fieldset implements ValidatableInterface
         if (!is_subclass_of($defaultFieldClass, Field::class)) {
             throw new \InvalidArgumentException(sprintf(
                 'Argument 1 passed to %s() must be an instance or a child of the %s, %s given', 
-                __METHOD__, Field::class, PhpHelp::getType($field)
+                __METHOD__, Field::class, PhpHelp::getType($defaultFieldClass)
             ));
         }
         $this->defaultFieldClass = $defaultFieldClass;
