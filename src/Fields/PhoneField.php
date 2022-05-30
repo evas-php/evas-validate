@@ -14,10 +14,15 @@ class PhoneField extends Field
     public $max = 16;
     public $pattern = '/(\d*)(\d{10})$/';
 
-    protected function prepareValue()
+    /**
+     * Подготовка значения к валидации.
+     * @param mixed|null значение
+     * @return mixed|null подготовленное значение
+     */
+    protected function prepareValue($value)
     {
         $pattern = '/\d/';
-        preg_match_all($pattern, $this->value, $matches);
-        $this->value = implode('', $matches[0]);
+        preg_match_all($pattern, $value, $matches);
+        return implode('', $matches[0]);
     }
 }
