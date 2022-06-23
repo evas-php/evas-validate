@@ -23,10 +23,7 @@ class Fieldset implements ValidatableInterface
 {
     // подключаем поддержку произвольных хуков в наследуемых классах
     use HooksTrait;
-
-    /**
-     * Подключаем поддержкуэкранирования html-тегов.
-     */
+    // Подключаем поддержкуэкранирования html-тегов.
     use HtmlEscapingTrait;
 
     /** @var string имя набора полей, если это вложенный набор полей */
@@ -57,7 +54,7 @@ class Fieldset implements ValidatableInterface
     /**
      * Предустановка свойств валидатора.
      */
-    public function propsPreset(): ?array
+    public function presetProps(): ?array
     {
         return null;
     }
@@ -69,10 +66,10 @@ class Fieldset implements ValidatableInterface
      */
     public function __construct(array $fields = null, array $props = null)
     {
+        $props = array_merge($this->presetProps() ?? [], $props ?? []);
+        if (!empty($props)) $this->setProps($props);
         $fields = array_merge($this->presetFields() ?? [], $fields ?? []);
         if ($fields) $this->fields($fields);
-        $props = array_merge($this->propsPreset() ?? [], $props ?? []);
-        if (!empty($props)) $this->setProps($props);
         $this->hook('afterCreate');
     }
 
