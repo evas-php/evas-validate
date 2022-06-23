@@ -16,10 +16,7 @@ class Field implements ValidatableInterface
 {
     // подключаем поддержку произвольных хуков в наследуемых классах
     use HooksTrait;
-
-    /**
-     * Подключаем поддержку экранирования html-тегов.
-     */
+    // Подключаем поддержку экранирования html-тегов.
     use HtmlEscapingTrait;
 
     /** @static array маппинг псевдонимов подстановки */
@@ -32,9 +29,9 @@ class Field implements ValidatableInterface
     public $name;
     /** @var string псевдоним поля */
     public $label;
-    /** @var string пришедшее значение в поле */
+    /** @var mixed пришедшее значение в поле */
     public $valueBefore;
-    /** @var string текущее значение в поле */
+    /** @var mixed текущее значение в поле */
     public $value;
     /** @var mixed значение по умолчанию */
     public $default;
@@ -70,7 +67,7 @@ class Field implements ValidatableInterface
     public $undefinedType;
 
     /** @var callable колбэк для подготовки значения к валидации */
-    public $prepareValue;
+    public $prepareValueCb;
 
 
     /** @var string сообщение об отсутствии значения, если поле обязательно */
@@ -100,6 +97,9 @@ class Field implements ValidatableInterface
     /** @var string сообщение об ошибке несовпадения значений в совпадающих полях */
     public $sameError;
 
+    /** @var bool запущена ли общая валидация */
+    protected $isRunCommon = false;
+
     /**
      * Конструктор.
      * @param array|null параметры валидатора поля
@@ -114,15 +114,28 @@ class Field implements ValidatableInterface
     }
 
     /**
-     * Подготовка значения к валидации.
-     * @param mixed|null значение
-     * @return mixed|null подготовленное значение
+     * Подготовка значения к валидации для кастомных классов валидаторов полей.
+     * @param mixed значение
+     * @return mixed подготовленное значение
      */
-    protected function prepareValue($value)
+    public function prepareValue($value)
+    {
+        return $value;
+    }
+
+    /**
+     * Общая базовая подготовка значения к валидации.
+     * @param mixed значение
+     * @return mixed подготовленное значение
+     */
+    protected function basePrepareValue($value)
     {
         // обрезание пробельных символов по краям, если включено
         if (true === $this->trim && is_string($value)) $value = trim($value);
-        $cb = $this->prepareValue;
+        // подготовка значения в кастомном классе валидатора поля
+        $value = $this->prepareValue($value);
+        // подготовка значения колбэком этого валидатора поля
+        $cb = $this->prepareValueCb;
         if (!empty($cb)) {
             $cb->bindTo($this);
             return $cb($value);
@@ -137,7 +150,7 @@ class Field implements ValidatableInterface
      */
     protected function setValue(&$value)
     {
-        if ($value !== null) $this->value = $this->prepareValue($value);
+        if ($value !== null) $this->value = $this->basePrepareValue($value);
         $value = $this->value;
     }
 
@@ -162,7 +175,7 @@ class Field implements ValidatableInterface
      */
     public function checkType($value = null): bool
     {
-        $this->setValue($value);
+        if (!$this->isRunCommon) $this->setValue($value);
         $type = $this->type;
         if (is_string($type)) $type = [$type];
         $error = 'type';
@@ -177,7 +190,10 @@ class Field implements ValidatableInterface
                 break;
             }
         }
-        return null === $error ? true : $this->buildError($error);
+        if ($error) return $this->buildError($error);
+
+        if (!$this->isRunCommon) $this->hook('afterValidate');
+        return true;
     }
 
     /**
@@ -187,7 +203,7 @@ class Field implements ValidatableInterface
      */
     public function checkLength($value = null): bool
     {
-        $this->setValue($value);
+        if (!$this->isRunCommon) $this->setValue($value);
         if (!is_string($value) && !is_numeric($value) && !is_null($value)) {
             return $this->checkType($value);
         }
@@ -206,6 +222,7 @@ class Field implements ValidatableInterface
                 return $this->buildError($error);
             }
         }
+        if (!$this->isRunCommon) $this->hook('afterValidate');
         return true;
     }
 
@@ -216,13 +233,16 @@ class Field implements ValidatableInterface
      */
     public function checkPattern($value = null): bool
     {
-        $this->setValue($value);
+        if (!$this->isRunCommon) $this->setValue($value);
         if (!is_string($value) && !is_numeric($value) && !is_null($value)) {
             return $this->checkType($value);
         }
-        return !empty($this->pattern)
-         && !preg_match($this->pattern, $value, $this->matches)
-         ? $this->buildError('pattern') : true;
+        if (!empty($this->pattern) && !preg_match($this->pattern, $value, $this->matches)) {
+            return $this->buildError('pattern');
+        }
+
+        if (!$this->isRunCommon) $this->hook('afterValidate');
+        return true;
     }
 
     /**
@@ -232,7 +252,7 @@ class Field implements ValidatableInterface
      */
     public function checkOptions($value = null): bool
     {
-        $this->setValue($value);
+        if (!$this->isRunCommon) $this->setValue($value);
         if (!empty($this->options)) {
             if (!is_array($this->options)) {
                 return $this->buildError('optionsSetting');
@@ -241,11 +261,12 @@ class Field implements ValidatableInterface
                 return $this->buildError('options');
             }
         }
+        if (!$this->isRunCommon) $this->hook('afterValidate');
         return true;
     }
 
     /**
-     * Проверка значения на валидность полю.
+     * Проверка значения на полную валидность полю.
      * @param mixed значение
      * @param bool пришло ли поле
      * @return bool
@@ -255,6 +276,7 @@ class Field implements ValidatableInterface
         $this->error = null;
         $this->valueBefore = $value;
         $this->setValue($value);
+        $this->isRunCommon = true;
 
         // если значение пустое
         if (null === $value) {
@@ -281,7 +303,8 @@ class Field implements ValidatableInterface
         if (!$this->checkLength()) return false;
         if (!$this->checkPattern()) return false;
         if (!$this->checkOptions()) return false;
-
+        
+        $this->isRunCommon = false;
         $this->hook('afterValidate');
 
         return true;
