@@ -10,11 +10,11 @@ use Evas\Validate\Fieldset;
 
 class JsonFieldset extends Fieldset
 {
-    /** @var string сообщение об ошибке разбора json */
+    /** @var string шаблон ошибки разбора json */
     public $jsonParseError;
-    /** @var string сообщение об ошибке пустого json */
+    /** @var string шаблон ошибки пустого json */
     public $jsonEmptyError;
-    /** @var string сообщение об ошибке типа json - должен быть строкой */
+    /** @var string шаблон ошибки типа json, он должен быть строкой */
     public $jsonTypeError;
 
     /**
