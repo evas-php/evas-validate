@@ -70,31 +70,31 @@ class Field implements ValidatableInterface
     public $prepareValueCb;
 
 
-    /** @var string сообщение об отсутствии значения, если поле обязательно */
+    /** @var string шаблон ошибки отсутствия значения, если поле обязательно */
     public $requiredError;
-    /** @var string сообщение об отсутствии функции проверки типа */
+    /** @var string шаблон ошибки отсутствия функции проверки типа */
     public $undefinedTypeError;
-    /** @var string сообщение о неправильном типе значения */
+    /** @var string шаблон ошибки неправильного типа значения */
     public $typeError;
-    /** @var string сообщение об ошибке длины текстового поля */
+    /** @var string шаблон ошибки длины текстового поля */
     public $lengthError;
-    /** @var string сообщение об ошибке длины, если есть только мин. длина */
+    /** @var string шаблон ошибки длины, если есть только мин. длина */
     public $minLengthError;
-    /** @var string сообщение об ошибке длины, если есть только макс. длина */
+    /** @var string шаблон ошибки длины, если есть только макс. длина */
     public $maxLengthError;
-    /** @var string сообщение об ошибке непопадания в диапазон значений */
+    /** @var string шаблон ошибки непопадания в диапазон значений */
     public $rangeError;
-    /** @var string сообщение об ошибке диапазона, если есть только мин. */
+    /** @var string шаблон ошибки диапазона, если есть только мин. */
     public $minRangeError;
-    /** @var string сообщение об ошибке диапазона, если есть только макс. */
+    /** @var string шаблон ошибки диапазона, если есть только макс. */
     public $maxRangeError;
-    /** @var string сообщение об ошибке регулярки */
+    /** @var string шаблон ошибки регулярки */
     public $patternError;
-    /** @var string сообщение об ошибке указания опций поля */
+    /** @var string шаблон ошибки указания опций поля */
     public $optionsSettingError;
-    /** @var string сообщение об ошибке несовпадения с опциями поля */
+    /** @var string шаблон ошибки несовпадения с опциями поля */
     public $optionsError;
-    /** @var string сообщение об ошибке несовпадения значений в совпадающих полях */
+    /** @var string шаблон ошибки несовпадения значений в совпадающих полях */
     public $sameError;
 
     /** @var bool запущена ли общая валидация */
@@ -268,7 +268,7 @@ class Field implements ValidatableInterface
     /**
      * Проверка значения на полную валидность полю.
      * @param mixed значение
-     * @param bool пришло ли поле
+     * @param bool|null пришло ли поле
      * @return bool
      */
     public function isValid($value, $isset = true): bool
@@ -313,7 +313,7 @@ class Field implements ValidatableInterface
     /**
      * Проверка значения на валидность полю с выбрасом исключения.
      * @param mixed значение
-     * @param bool пришло ли поле
+     * @param bool|null пришло ли поле
      * @return self
      * @throws ValidateException
      */
