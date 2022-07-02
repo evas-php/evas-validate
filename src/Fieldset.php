@@ -26,21 +26,21 @@ class Fieldset implements ValidatableInterface
     // Подключаем поддержкуэкранирования html-тегов.
     use HtmlEscapingTrait;
 
-    /** @var string имя набора полей, если это вложенный набор полей */
+    /** @var string имя набора полей, требуется для вложенного набора полей */
     public $name;
-    /** @var array валидаторы полей [имя поля => валидатор] */
-    public $fields = [];
-    /** @var Errors объект ошибок */
-    protected $errors;
-    /** @var array значения после валидации [имя поля => значение] */
-    public $values = [];    
-    /** @var array исходные значения до валидации [имя поля => значение] */
-    public $valuesBefore = [];
-
+    /** @var string шаблон ошибки несоответствия типа значений, переданных в набор полей */
+    public $valuesTypeError;
     /** @var string класс валидатора поля по умолчанию */
     public $defaultFieldClass = EVAS_VALIDATE_DEFAULT_FIELD_CLASS;
+    /** @var array исходные значения до валидации [имя поля => значение] */
+    public $valuesBefore = [];
+    /** @var array значения после валидации [имя поля => значение] */
+    public $values = [];
 
-    public $valuesTypeError;
+    /** @var array валидаторы полей [имя поля => валидатор] */
+    protected $fields = [];
+    /** @var Errors объект ошибок */
+    protected $errors;
 
     /**
      * Предустановленные поля валидатора.
@@ -61,7 +61,7 @@ class Fieldset implements ValidatableInterface
 
     /**
      * Конструктор.
-     * @param array|null [имя поля => валидатор] или [имя поля => параметры валидатора]
+     * @param array|null маппинг валидаторов полей или параметров валидаторов полей по их именам
      * @param array|null параметры валидатора набора полей
      */
     public function __construct(array $fields = null, array $props = null)
@@ -75,7 +75,7 @@ class Fieldset implements ValidatableInterface
 
     /**
      * Установка свойств набора полей.
-     * @param array параметры
+     * @param array маппинг свойств
      * @return self
      */
     public function setProps(array $props)
@@ -106,7 +106,7 @@ class Fieldset implements ValidatableInterface
 
     /**
      * Установка валидаторов полей.
-     * @param array маппинг валидаторов или параметров валидаторов по именам полей
+     * @param array маппинг валидаторов полей или параметров валидаторов полей по их именам
      * @return self
      */
     public function fields(array $fields)
@@ -142,12 +142,21 @@ class Fieldset implements ValidatableInterface
     }
 
     /**
-     * Получение вложенного поля или набора полей.
+     * Получение поля из набора полей.
      * @return ValidatableInterface|null вложенное поле или набор полей
      */
     public function getField(string $name): ?ValidatableInterface
     {
         return $this->fields[$name] ?? null;
+    }
+
+    /**
+     * Получение всех полей из набора полей.
+     * @return array
+     */
+    public function getFields(): array
+    {
+        return $this->fields;
     }
 
     /**
