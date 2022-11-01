@@ -35,7 +35,7 @@ class Field implements ValidatableInterface
     public $value;
     /** @var mixed значение по умолчанию */
     public $default;
-    /** @var string тип поля */
+    /** @var string|array тип поля */
     public $type = 'string';
     /** @var bool проверять ли тип значения поля */
     public $checkType = false;
@@ -78,16 +78,10 @@ class Field implements ValidatableInterface
     public $typeError;
     /** @var string шаблон ошибки длины текстового поля */
     public $lengthError;
-    /** @var string шаблон ошибки длины, если есть только мин. длина */
-    public $minLengthError;
-    /** @var string шаблон ошибки длины, если есть только макс. длина */
-    public $maxLengthError;
     /** @var string шаблон ошибки непопадания в диапазон значений */
     public $rangeError;
-    /** @var string шаблон ошибки диапазона, если есть только мин. */
-    public $minRangeError;
-    /** @var string шаблон ошибки диапазона, если есть только макс. */
-    public $maxRangeError;
+    /** @var string шаблон ошибки непопадания в диапазон количества элементов массива/объекта */
+    public $countError;
     /** @var string шаблон ошибки регулярки */
     public $patternError;
     /** @var string шаблон ошибки указания опций поля */
@@ -176,10 +170,9 @@ class Field implements ValidatableInterface
     public function checkType($value = null): bool
     {
         if (!$this->isRunCommon) $this->setValue($value);
-        $type = $this->type;
-        if (is_string($type)) $type = [$type];
+        if (!is_array($this->type)) $this->type = [$this->type];
         $error = 'type';
-        foreach ($type as &$subtype) {
+        foreach ($this->type as &$subtype) {
             $typeCheck = 'is_' . $subtype;
             if (!is_callable($typeCheck)) {
                 $error = 'undefinedType';
@@ -204,21 +197,26 @@ class Field implements ValidatableInterface
     public function checkLength($value = null): bool
     {
         if (!$this->isRunCommon) $this->setValue($value);
-        if (!is_string($value) && !is_numeric($value) && !is_null($value)) {
-            return $this->checkType($value);
+        if (true === $this->checkType || !is_null($value)) {
+            if (false === $this->checkType($value)) return false;
         }
+        if (!is_array($this->type)) $this->type = [$this->type];
         if (null !== $this->min || null !== $this->max) {
-            if ('string' === $this->type) {
+            if (in_array('string', $this->type)) {
                 $len = mb_strlen($value);
                 $error = 'length';
+            } else if (in_array('array', $this->type)) {
+                $len = count($value ?? []);
+                $error = 'count';
+            } else if (in_array('object', $this->type)) {
+                $len = count(get_object_vars($value ?? (object) []));
+                $error = 'count';
             } else {
-                $len = $value;    
+                $len = $value;
                 $error = 'range';
             }
             if (null !== $this->min && $len < $this->min
              || null !== $this->max && $len > $this->max) {
-                if (null === $this->max) $error = 'min'. ucfirst($error);
-                else if (null === $this->min) $error = 'max'. ucfirst($error);
                 return $this->buildError($error);
             }
         }
@@ -275,22 +273,22 @@ class Field implements ValidatableInterface
     {
         $this->error = null;
         $this->valueBefore = $value;
-        $this->setValue($value);
         $this->isRunCommon = true;
 
         // если значение пустое
+        if (null === $value) $value = $this->default;
+        $this->setValue($value);
+
         if (null === $value) {
-            $value = $this->default;
-            if (null === $value) {
-                if (true === $this->required) {
-                    // если обязательное поле пустое
-                    return $this->buildError('required');
-                } else if (false === $isset) {
-                    // если необязательное поле не пришло
-                    return true;
-                }
+            if (true === $this->required) {
+                // если обязательное поле пустое
+                return $this->buildError('required');
+            } else if (false === $isset) {
+                // если необязательное поле не пришло
+                return true;
             }
         }
+
         // валидация типа поля
         if (false !== $this->checkType && !$this->checkType($value)) return false;
 
@@ -300,9 +298,9 @@ class Field implements ValidatableInterface
         // валидация длины строки или попадания числа в диапазон
         // валидация по регулярке
         // валидаци опций
-        if (!$this->checkLength()) return false;
-        if (!$this->checkPattern()) return false;
-        if (!$this->checkOptions()) return false;
+        if (!$this->checkLength($value)) return false;
+        if (!$this->checkPattern($value)) return false;
+        if (!$this->checkOptions($value)) return false;
         
         $this->isRunCommon = false;
         $this->hook('afterValidate');
