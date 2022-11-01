@@ -31,7 +31,9 @@ class ErrorBuilderTest extends \Codeception\Test\Unit
         $this->assertFalse($field->isValid('test'));
         $this->assertEquals($customLengthError, $field->error);
 
-        $this->assertFalse($field->isValid('test@test.t'));
+        // codecept_debug($field);
+        $this->assertFalse($field->isValid('test@test.t'));        
+        // codecept_debug($field);
         $this->assertEquals($customPatternError, $field->error);
     }
 
@@ -43,7 +45,7 @@ class ErrorBuilderTest extends \Codeception\Test\Unit
         $fieldset = new Fieldset(null, [
             'valuesTypeError' => 'valuesTypeCustomError',
         ]);
-        $this->assertFalse($fieldset->isValid(null));
+        $this->assertFalse($fieldset->isValid('string data'));
         $this->assertEquals('valuesTypeCustomError', $fieldset->errors()->last());
     }
 

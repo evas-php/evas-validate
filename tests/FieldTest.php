@@ -37,7 +37,7 @@ class FieldTest extends \Codeception\Test\Unit
     {
         return new Field([
             'label' => 'Rating',
-            'type' => 'float',
+            'type' => 'numeric',
             'min' => 0,
             'max' => 5,
         ]);
@@ -133,12 +133,11 @@ class FieldTest extends \Codeception\Test\Unit
     public function testType()
     {
         $this->field = $this->makeRatingField();
-        $this->assertTrue($this->field->isValid(4.93));
-        $this->assertTrue($this->field->isValid('4.93'));
-        // включаем проверку типа
-        $this->field->checkType = true;
-        $this->assertTrue($this->field->isValid(4.93));
-        $this->checkError('type', '4.93');
+        $this->assertTrue($this->field->checkType(4.93));
+        $this->assertTrue($this->field->checkType('4.93'));
+        $this->checkError('type', 'abc4.93');
+        $this->checkError('type', ['abc4.93', 123, '123212122112']);
+        $this->checkError('type', (object) ['abc4.93', 123, '123212122112']);
     }
 
 
